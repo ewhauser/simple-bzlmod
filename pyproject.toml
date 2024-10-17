@@ -1,0 +1,20 @@
+[project]
+requires-python = "==3.11"
+
+[tool.ruff]
+extend-exclude = ["**/*pb2*", "**/*.pyi", "**/gensql/*.py"]
+force-exclude = true
+
+[tool.ruff.lint]
+extend-select = ["I", "PIE796", "UP", "ASYNC", "PERF"]
+ignore = ["I001"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
+"**/factory.py" = ["F401", "F811"]
+"python/pms/app/managers/zendesk_user_manager/timezone_mapping.py" = ["F601"]
+"python/cerebro/app/tasks/tasks.py" = ["F401"]
+"external/rules_python_gazelle_plugin/manifest/copy_to_source.py" = ["F401"]
+
+[tool.sqlfmt]
+no_jinjafmt=true

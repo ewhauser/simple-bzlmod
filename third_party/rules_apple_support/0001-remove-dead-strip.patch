@@ -1,0 +1,16 @@
+diff --git a/crosstool/cc_toolchain_config.bzl b/crosstool/cc_toolchain_config.bzl
+index e274cf6..a43bea7 100644
+--- a/crosstool/cc_toolchain_config.bzl
++++ b/crosstool/cc_toolchain_config.bzl
+@@ -1090,11 +1090,6 @@ please file an issue at https://github.com/bazelbuild/apple_support/issues/new
+                     ),
+                 ],
+             ),
+-            flag_set(
+-                actions = _DYNAMIC_LINK_ACTIONS,
+-                flag_groups = [flag_group(flags = ["-dead_strip"])],
+-                with_features = [with_feature_set(features = ["opt"])],
+-            ),
+         ],
+     )
+ 

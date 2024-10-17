@@ -1,0 +1,259 @@
+bazel_dep(name = "apple_support", version = "1.17.1")
+bazel_dep(name = "aspect_bazel_lib", version = "2.9.3")
+bazel_dep(name = "aspect_rules_jest", version = "0.22.0")
+bazel_dep(name = "aspect_rules_js", version = "2.1.0")
+bazel_dep(name = "aspect_rules_swc", version = "2.0.1")
+bazel_dep(name = "aspect_rules_ts", version = "3.2.1")
+bazel_dep(name = "bazel_features", version = "1.19.0")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "build_stack_rules_proto")
+bazel_dep(name = "buildifier_prebuilt", version = "7.3.1")
+bazel_dep(name = "container_structure_test", version = "1.19.1")
+bazel_dep(name = "gazelle", repo_name = "bazel_gazelle")
+bazel_dep(name = "googleapis", version = "0.0.0-20240819-fe8ba054a")
+bazel_dep(name = "protobuf", version = "28.0")
+bazel_dep(name = "platforms", version = "0.0.10")
+bazel_dep(name = "rules_apple", version = "3.9.2")
+bazel_dep(name = "rules_buf", version = "0.3.0")
+bazel_dep(name = "rules_distroless", version = "0.3.8")
+bazel_dep(name = "rules_license", version = "1.0.0")
+bazel_dep(name = "rules_go", version = "0.50.1")
+bazel_dep(name = "rules_multirun", version = "0.9.0")
+bazel_dep(name = "rules_multitool", version = "0.13.0")
+bazel_dep(name = "rules_nodejs", version = "6.3.1")
+bazel_dep(name = "rules_oci", version = "2.0.1")
+bazel_dep(name = "rules_pkg", version = "1.0.1")
+bazel_dep(name = "rules_proto", version = "6.0.2")
+bazel_dep(name = "rules_python", version = "0.37.0")
+bazel_dep(name = "rules_python_gazelle_plugin", version = "0.37.0")
+bazel_dep(name = "rules_swift", version = "2.1.1")
+bazel_dep(name = "toolchains_protoc", version = "0.3.3")
+
+## overrides
+git_override(
+    module_name = "build_stack_rules_proto",
+    commit = "c46736d3c587fb2bcda305ffebb65b45f36e16a4",
+    patch_strip = 1,
+    patches = [
+        "//:go/rules_proto/0004-write-source-file-info.patch",
+        "//:go/rules_proto/0005-proto-compiled-sources.patch",
+        "//:go/rules_proto/0006-prebuilt-grpc-python-plugin.patch",
+        "//:go/rules_proto/0007-fatal-warnings.patch",
+    ],
+    remote = "https://github.com/ewhauser/rules_proto",
+)
+
+git_override(
+    module_name = "gazelle",
+    commit = "2a65ce83f2fc9cd7022139a621fe7fde8157a85f",
+    patch_strip = 1,
+    patches = [
+        "//:third_party/gazelle/0001-googleapis.patch",
+    ],
+    remote = "https://github.com/bazelbuild/bazel-gazelle",
+)
+
+RULES_HUGO_COMMIT = "2927451ff7fff708292eb7eb68ca278457c5dd78"
+
+RULES_HUGO_SHA256 = "f076f8098d95e4d3636918eed0b8f09c252f62ac992ba5e396f10c6cf2137849"
+
+single_version_override(
+    module_name = "apple_support",
+    patch_strip = 1,
+    patches = [
+        # https://github.com/bazelbuild/bazel-gazelle/issues/1793
+        "//:third_party/rules_apple_support/0001-remove-dead-strip.patch",
+    ],
+)
+
+git_override(
+    module_name = "protobuf_javascript",
+    commit = "5d939dbc8fd5245c4316d52c203a1bff24bac5c4",  # https://github.com/protocolbuffers/protobuf-javascript/commit/05560593d93e7207e84829b3ab6a80c08078e389
+    remote = "https://github.com/protocolbuffers/protobuf-javascript",
+)
+
+single_version_override(
+    module_name = "rules_swift",
+    patch_strip = 1,
+    patches = [
+        "//:third_party/rules_swift/0001-rules-proto.patch",
+    ],
+)
+
+## aspect_bazel_lib
+bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
+bazel_lib_toolchains.copy_directory()
+bazel_lib_toolchains.copy_to_directory()
+bazel_lib_toolchains.coreutils()
+bazel_lib_toolchains.expand_template()
+bazel_lib_toolchains.jq()
+bazel_lib_toolchains.tar()
+bazel_lib_toolchains.yq()
+bazel_lib_toolchains.zstd()
+use_repo(
+    bazel_lib_toolchains,
+    "bsd_tar_toolchains",
+    "copy_directory_toolchains",
+    "copy_to_directory_toolchains",
+    "coreutils_toolchains",
+    "expand_template_toolchains",
+    "jq_toolchains",
+    "yq_toolchains",
+)
+
+## go
+go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
+go_sdk.download(
+    name = "go_sdk",
+    version = "1.22.6",
+)
+
+go_deps = use_extension("@bazel_gazelle//:extensions.bzl", "go_deps")
+go_deps.from_file(go_mod = "@//:go.mod")
+
+# https://github.com/bazelbuild/bazel-gazelle/issues/1058
+# https://github.com/bazelbuild/rules_go/blob/5d306c433cebb1ae8a7b72df2a055be2bacbb12b/go/dependencies.rst#grpc-dependencies
+go_deps.gazelle_override(
+    directives = [
+        "gazelle:proto disable",
+    ],
+    path = "google.golang.org/grpc",
+)
+
+go_deps.gazelle_override(
+    directives = [
+        "gazelle:proto disable_global",
+    ],
+    path = "google.golang.org/protobuf",
+)
+go_deps.module_override(
+    patch_strip = 1,
+    patches = ["//:third_party/aspect_cli/0001-bzlmod.patch"],
+    path = "aspect.build/cli",
+)
+use_repo(
+    go_deps,
+    "build_aspect_cli",
+    "com_github_stackb_rules_proto",
+    "com_github_bazelbuild_bazel_gazelle",
+)
+
+## python
+PYTHON_VERSION = "3.11.4"
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = PYTHON_VERSION,
+)
+use_repo(python, python = "python_versions")
+
+## protoc
+protoc = use_extension("@toolchains_protoc//protoc:extensions.bzl", "protoc")
+protoc.toolchain(
+    google_protobuf = "com_google_protobuf",
+    version = "v28.0",
+)
+use_repo(protoc, "com_google_protobuf", "toolchains_protoc_hub")
+
+register_toolchains("@toolchains_protoc_hub//:all")
+
+## buf
+buf = use_extension("@rules_buf//buf:extensions.bzl", "buf")
+buf.toolchains(version = "v1.5.0")
+use_repo(buf, "rules_buf_toolchains")
+
+## proto
+proto_repository = use_extension("@build_stack_rules_proto//extensions:proto_repository.bzl", "proto_repository")
+proto_repository.archive(
+    name = "protoapis",
+    build_directives = [
+        "gazelle:exclude testdata",
+        "gazelle:exclude google/protobuf/compiler/ruby",
+        "gazelle:exclude google/protobuf/util",
+        "gazelle:proto_language go enable true",
+        "gazelle:proto_language ts enable true",
+    ],
+    build_file_expunge = True,
+    build_file_proto_mode = "file",
+    cfgs = ["//tools:protoc_gen_validate_config.yaml"],
+    deleted_files = [
+        "google/protobuf/any_test.proto",
+        "google/protobuf/map_lite_unittest.proto",
+        "google/protobuf/map_proto2_unittest.proto",
+        "google/protobuf/map_proto3_unittest.proto",
+        "google/protobuf/map_unittest.proto",
+        "google/protobuf/test_messages_proto2.proto",
+        "google/protobuf/test_messages_proto3.proto",
+        "google/protobuf/unittest.proto",
+        "google/protobuf/unittest_arena.proto",
+        "google/protobuf/unittest_custom_options.proto",
+        "google/protobuf/unittest_drop_unknown_fields.proto",
+        "google/protobuf/unittest_embed_optimize_for.proto",
+        "google/protobuf/unittest_empty.proto",
+        "google/protobuf/unittest_enormous_descriptor.proto",
+        "google/protobuf/unittest_import_lite.proto",
+        "google/protobuf/unittest_import_public_lite.proto",
+        "google/protobuf/unittest_import_public.proto",
+        "google/protobuf/unittest_import.proto",
+        "google/protobuf/unittest_lazy_dependencies_custom_option.proto",
+        "google/protobuf/unittest_lazy_dependencies_enum.proto",
+        "google/protobuf/unittest_lazy_dependencies.proto",
+        "google/protobuf/unittest_lite_imports_nonlite.proto",
+        "google/protobuf/unittest_lite.proto",
+        "google/protobuf/unittest_mset_wire_format.proto",
+        "google/protobuf/unittest_mset.proto",
+        "google/protobuf/unittest_no_field_presence.proto",
+        "google/protobuf/unittest_no_generic_services.proto",
+        "google/protobuf/unittest_optimize_for.proto",
+        "google/protobuf/unittest_preserve_unknown_enum.proto",
+        "google/protobuf/unittest_preserve_unknown_enum2.proto",
+        "google/protobuf/unittest_proto3_arena_lite.proto",
+        "google/protobuf/unittest_proto3_arena.proto",
+        "google/protobuf/unittest_proto3_lite.proto",
+        "google/protobuf/unittest_proto3_optional.proto",
+        "google/protobuf/unittest_proto3.proto",
+        "google/protobuf/unittest_retention.proto",
+        "google/protobuf/unittest_well_known_types.proto",
+        "google/protobuf/compiler/cpp/test_bad_identifiers.proto",
+    ],
+    reresolve_known_proto_imports = True,
+    sha256 = "087c2ec84a07308318d35e0e39717e2037e05d14e628244602a2c78fbe203fa5",
+    strip_prefix = "protobuf-a74f54b724bdc2fe0bfc271f4dc0ceb159805625/src",
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/a74f54b724bdc2fe0bfc271f4dc0ceb159805625.tar.gz"],
+)
+proto_repository.archive(
+    name = "googleapis",
+    build_directives = [
+        "gazelle:exclude google/ads/googleads/v12/services",
+        "gazelle:exclude google/ads/googleads/v13/services",
+        "gazelle:exclude google/ads/googleads/v14/services",
+        "gazelle:proto_language go enable true",
+        "gazelle:proto_language ts enable true",
+    ],
+    build_file_expunge = True,
+    build_file_proto_mode = "file",
+    cfgs = ["//:rules_proto_config.yaml"],
+    imports = ["@protoapis//:imports.csv"],
+    reresolve_known_proto_imports = True,
+    sha256 = "e5b59ae2c0c812e3867158eca8e484fddb96dff03b8e2073bf44242b708fa919",
+    strip_prefix = "googleapis-e115ab1839cb6e1bd953e40337b7e84001291766",
+    urls = ["https://github.com/googleapis/googleapis/archive/e115ab1839cb6e1bd953e40337b7e84001291766.tar.gz"],
+)
+use_repo(
+    proto_repository,
+    "protoapis",
+)
+
+## rules_proto
+rules_proto_dependencies = use_extension("//go/rules_proto:extensions.bzl", "rules_proto_dependencies")
+use_repo(
+    rules_proto_dependencies,
+    "com_github_einride_protoc_gen_go_aip_v0_60_darwin_x86_64",
+    "com_github_einride_protoc_gen_go_aip_v0_60_linux_x86_64",
+    "com_github_einride_protoc_gen_go_aip_v0_60_windows_x86_64",
+    "com_github_grpc_ecosystem_grpc_gateway_releases_download_v2_10_0_protoc_gen_grpc_gateway_2_10_0_darwin_x86_64",
+    "com_github_grpc_ecosystem_grpc_gateway_releases_download_v2_10_0_protoc_gen_grpc_gateway_2_10_0_linux_x86_64",
+    "com_github_pseudomuto_protoc_gen_doc_v1_5_1_darwin_x86_64",
+    "com_github_pseudomuto_protoc_gen_doc_v1_5_1_linux_x86_64",
+)

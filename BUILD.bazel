@@ -1,0 +1,33 @@
+load("@bazel_gazelle//:def.bzl", "gazelle_binary")
+load("@build_stack_rules_proto//rules:proto_gazelle.bzl", "proto_gazelle")
+
+gazelle_binary(
+    name = "gazelle-go-bin",
+    languages = [
+        "@bazel_gazelle//language/go",
+        "@rules_python_gazelle_plugin//python",
+        "@bazel_gazelle//language/proto",
+        "//go/rules_proto/language",
+    ],
+)
+
+# gazelle_check verifies that Gazelle files are up to date.
+proto_gazelle(
+    name = "gazelle_check",
+    cfgs = ["//:rules_proto_config.yaml"],
+    command = "fix",
+    extra_args = ["--mode=diff"],
+    gazelle = "gazelle-go-bin",
+    imports = ["//tools:proto_imports.csv"],
+)
+
+# See https://github.com/bazelbuild/bazel-gazelle/blob/master/extend.md#example
+proto_gazelle(
+    name = "gazelle",
+    args = [
+        "-proto_configs=rules_proto_config.yaml",
+    ],
+    cfgs = ["//:rules_proto_config.yaml"],
+    gazelle = ":gazelle-go-bin",
+    imports = ["//tools:proto_imports.csv"],
+)

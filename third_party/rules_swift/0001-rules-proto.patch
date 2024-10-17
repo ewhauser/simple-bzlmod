@@ -1,0 +1,15 @@
+diff --git a/swift/extras.bzl b/swift/extras.bzl
+index f163680..be9a22f 100644
+--- a/swift/extras.bzl
++++ b/swift/extras.bzl
+@@ -21,6 +21,10 @@ load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependen
+ load(
+     "@rules_proto//proto:repositories.bzl",
+     "rules_proto_dependencies",
++)
++
++load(
++    "@rules_proto//proto:toolchains.bzl",
+     "rules_proto_toolchains",
+ )
+ 

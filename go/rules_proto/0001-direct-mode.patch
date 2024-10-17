@@ -1,0 +1,49 @@
+diff --git a/rules/proto_compile.bzl b/rules/proto_compile.bzl
+index 4347b8fb..61245262 100644
+--- a/rules/proto_compile.bzl
++++ b/rules/proto_compile.bzl
+@@ -240,6 +240,10 @@ def _proto_compile_impl(ctx):
+         for k, v in plugin.mods.items():
+             mods[k] = v
+ 
++        if plugin.direct_mode:
++            args.append("--proto_path={}".format(proto_info.proto_source_root))
++            inputs += protos
++
+     ###
+     ### Part 3: trailing args
+     ###
+diff --git a/rules/proto_plugin.bzl b/rules/proto_plugin.bzl
+index bf321ee4..218ba780 100644
+--- a/rules/proto_plugin.bzl
++++ b/rules/proto_plugin.bzl
+@@ -17,6 +17,7 @@ def _proto_plugin_impl(ctx):
+             tool_target = ctx.attr.tool,
+             use_built_in_shell_environment = ctx.attr.use_built_in_shell_environment,
+             protoc_plugin_name = ctx.attr.protoc_plugin_name,
++            direct_mode = ctx.attr.direct_mode,
+             exclusions = ctx.attr.exclusions,
+             mods = ctx.attr.mods,
+             data = ctx.files.data,
+@@ -67,5 +68,9 @@ proto_plugin = rule(
+         "mods": attr.string_dict(
+             doc = "content modifications to apply to the output files",
+         ),
++        "direct_mode": attr.bool(
++            doc = "Whether the plugin add import roots and direct source files to protoc",
++            default = False,
++         ),        
+     },
+ )
+diff --git a/rules/providers.bzl b/rules/providers.bzl
+index 338c2dcb..883ede30 100644
+--- a/rules/providers.bzl
++++ b/rules/providers.bzl
+@@ -12,6 +12,7 @@ ProtoPluginInfo = provider(
+         "use_built_in_shell_environment": "Whether the tool should use the built in shell environment or not",
+         "protoc_plugin_name": "The name used for the plugin binary on the protoc command line. Useful for targeting built-in plugins. Uses plugin name when not set",
+         "exclusions": "Exclusion filters to apply when generating outputs with this plugin. Used to prevent generating files that are included in the protobuf library, for example. Can exclude either by proto name prefix or by proto folder prefix",
++        "direct_mode": "Whether the plugin add import roots and direct source files to protoc",        
+         "mods": "awk expressions to apply to the output files",
+         "data": "Additional files required for running the plugin",
+         "out": "The format for the --x_out argument.  Defaults to to {BIN_DIR}",
