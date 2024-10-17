@@ -1,0 +1,29 @@
+diff --git a/pkg/plugin/grpc/grpc/BUILD.bazel b/pkg/plugin/grpc/grpc/BUILD.bazel
+index 60696437..5b2e9caf 100644
+--- a/pkg/plugin/grpc/grpc/BUILD.bazel
++++ b/pkg/plugin/grpc/grpc/BUILD.bazel
+@@ -37,9 +37,9 @@ genrule(
+ genrule(
+     name = "protoc-gen-grpc-python_tool",
+     outs = ["protoc-gen-grpc-python"],
+-    cmd = "cp $(location @com_github_grpc_grpc//src/compiler:grpc_python_plugin) $@",
++    cmd = "cp $(location @@//tools:grpc_python_plugin) $@",
+     executable = True,
+-    tools = ["@com_github_grpc_grpc//src/compiler:grpc_python_plugin"],
++    tools = ["@@//tools:grpc_python_plugin"],
+ )
+ 
+ go_bazel_test(
+diff --git a/plugin/grpc/grpc/BUILD.bazel b/plugin/grpc/grpc/BUILD.bazel
+index cf340706..dd4c3acb 100644
+--- a/plugin/grpc/grpc/BUILD.bazel
++++ b/plugin/grpc/grpc/BUILD.bazel
+@@ -8,7 +8,7 @@ proto_plugin(
+ 
+ proto_plugin(
+     name = "protoc-gen-grpc-python",
+-    tool = "@com_github_grpc_grpc//src/compiler:grpc_python_plugin",
++    tool = "@@//tools:grpc_python_plugin",
+     visibility = ["//visibility:public"],
+ )
+ 

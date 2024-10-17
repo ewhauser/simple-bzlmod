@@ -1,0 +1,13 @@
+diff --git a/rules/proto_compile.bzl b/rules/proto_compile.bzl
+index 4347b8fb..7fc4bba4 100644
+--- a/rules/proto_compile.bzl
++++ b/rules/proto_compile.bzl
+@@ -253,6 +253,8 @@ def _proto_compile_impl(ctx):
+         [d.path for d in descriptors],
+     )))
+ 
++    args.append("--fatal_warnings")
++
+     ### Part 3.2: add proto file args
+ 
+     protos = _uniq(protos)

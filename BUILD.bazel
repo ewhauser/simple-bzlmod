@@ -1,0 +1,51 @@
+load("@bazel_gazelle//:def.bzl", "gazelle_binary")
+load("@build_stack_rules_proto//rules:proto_gazelle.bzl", "proto_gazelle")
+load("@pypi//:requirements.bzl", "all_whl_requirements")
+load("@rules_python_gazelle_plugin//modules_mapping:def.bzl", "modules_mapping")
+
+gazelle_binary(
+    name = "gazelle-go-bin",
+    languages = [
+        "@bazel_gazelle//language/go",
+        "@rules_python_gazelle_plugin//python",
+        "@bazel_gazelle//language/proto",
+        "//go/rules_proto/language",
+    ],
+)
+
+# gazelle_check verifies that Gazelle files are up to date.
+proto_gazelle(
+    name = "gazelle_check",
+    cfgs = ["//:rules_proto_config.yaml"],
+    command = "fix",
+    extra_args = ["--mode=diff"],
+    gazelle = "gazelle-go-bin",
+    imports = ["//tools:proto_imports.csv"],
+)
+
+modules_mapping(
+    name = "modules_map",
+    exclude_patterns = [
+        "^_|(\\._)+",
+        "tests\\.*",
+    ],
+    wheels = all_whl_requirements,
+)
+
+# gazelle_python_manifest(
+#    name = "gazelle_python_manifest",
+#    modules_mapping = ":modules_map",
+#    pip_repository_name = "pypi",
+#    requirements = "//:requirements.compiled",
+#)
+
+# See https://github.com/bazelbuild/bazel-gazelle/blob/master/extend.md#example
+proto_gazelle(
+    name = "gazelle",
+    args = [
+        "-proto_configs=rules_proto_config.yaml",
+    ],
+    cfgs = ["//:rules_proto_config.yaml"],
+    gazelle = ":gazelle-go-bin",
+    imports = ["//tools:proto_imports.csv"],
+)

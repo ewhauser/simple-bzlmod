@@ -1,0 +1,12 @@
+diff --git a/rules/proto_compiled_sources.bzl b/rules/proto_compiled_sources.bzl
+index f6f9c7c4..a128fe7c 100644
+--- a/rules/proto_compiled_sources.bzl
++++ b/rules/proto_compiled_sources.bzl
+@@ -41,6 +41,7 @@ def proto_compiled_sources(**kwargs):
+         mode = "update",
+         update_target_label_name = name_update,
+         tags = tags,
++        visibility = ["//visibility:public"],        
+     )
+ 
+     proto_compile_gencopy_test(

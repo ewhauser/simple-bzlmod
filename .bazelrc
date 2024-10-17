@@ -1,0 +1,59 @@
+# Import presets
+
+import %workspace%/.aspect/bazelrc/correctness.bazelrc
+import %workspace%/.aspect/bazelrc/debug.bazelrc
+import %workspace%/.aspect/bazelrc/convenience.bazelrc
+import %workspace%/.aspect/bazelrc/javascript.bazelrc
+import %workspace%/.aspect/bazelrc/performance.bazelrc
+import %workspace%/.aspect/bazelrc/bazel7.bazelrc
+
+# We have some rules that import empty blobs. These should be cleaned up so we can remove this behavior.
+common --incompatible_disallow_empty_glob=false
+
+# Docs: https://bazel.build/docs/user-manual#test-verbose-timeout-warnings
+# This is just annoying so we disable
+test --test_verbose_timeout_warnings=false
+
+# Skip creation of the `bazel-out` (and friends) symlink in the workspace root. This is annoying for IDEs, indexing, etc.
+build --noexperimental_convenience_symlinks
+test --noexperimental_convenience_symlinks
+
+# Disabling runfiles links drastically increases performance in slow disk IO situations
+# such as running on a Codespace
+build --nobuild_runfile_links
+coverage --nobuild_runfile_links
+test --nobuild_runfile_links
+
+# https://bazel.build/reference/command-line-reference#flag--legacy_external_runfiles
+build --nolegacy_external_runfiles
+test --nolegacy_external_runfiles
+
+build --experimental_repository_downloader_retries=10
+test --experimental_repository_downloader_retries=10
+
+build --incompatible_default_to_explicit_init_py
+
+# https://github.com/bazelbuild/bazel/issues/16522
+build --incompatible_legacy_local_fallback
+test --incompatible_legacy_local_fallback
+
+test --sandbox_default_allow_network
+
+# This is a workaround so we don't constantly recompile protoc
+# https://github.com/bazelbuild/bazel/issues/8485
+build --proto_compiler=@build_stack_rules_proto//toolchain:protoc.exe
+
+# See https://github.com/aspect-build/toolchains_protoc?tab=readme-ov-file#installation
+common --incompatible_enable_proto_toolchain_resolution
+
+build --protocopt=--fatal_warnings
+
+test --experimental_split_coverage_postprocessing
+test --experimental_fetch_all_coverage_outputs
+
+# For performance purposes, we use the validation aspect so that nogo
+# validations runs in parallel with tests
+#
+# https://bazelbuild.slack.com/archives/CDBP88Z0D/p1725884059942449
+build --experimental_use_validation_aspect
+test --experimental_use_validation_aspect

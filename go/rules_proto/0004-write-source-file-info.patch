@@ -1,0 +1,21 @@
+diff --git a/rules/proto_compile_gencopy.bzl b/rules/proto_compile_gencopy.bzl
+index 975debd0..14bc8102 100644
+--- a/rules/proto_compile_gencopy.bzl
++++ b/rules/proto_compile_gencopy.bzl
+@@ -3,6 +3,7 @@
+ 
+ load("//cmd/gencopy:gencopy.bzl", "gencopy_action", "gencopy_attrs", "gencopy_config")
+ load(":providers.bzl", "ProtoCompileInfo")
++load("@aspect_bazel_lib//lib:write_source_files.bzl", "WriteSourceFileInfo")
+ 
+ def _copy_file(actions, src, dst):
+     """Copy a file to a new path destination
+@@ -74,7 +75,7 @@ def _proto_compile_gencopy_impl(ctx):
+         files = depset([config_json]),
+         runfiles = runfiles,
+         executable = script,
+-    )]
++    ), WriteSourceFileInfo(executable = script)]
+ 
+ def _proto_compile_gencopy_rule(is_test):
+     return rule(

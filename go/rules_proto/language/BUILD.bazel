@@ -1,0 +1,30 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "language",
+    srcs = ["language.go"],
+    importpath = "github.com/ewhauser/simple-bzlmod/go/rules_proto/language",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bazel_gazelle//language:go_default_library",
+        "@build_stack_rules_proto//pkg/language/protobuf",
+        "@build_stack_rules_proto//pkg/plugin/builtin",
+        "@build_stack_rules_proto//pkg/plugin/gogo/protobuf",
+        "@build_stack_rules_proto//pkg/plugin/golang/protobuf",
+        "@build_stack_rules_proto//pkg/plugin/grpc/grpc",
+        "@build_stack_rules_proto//pkg/plugin/grpc/grpcgo",
+        "@build_stack_rules_proto//pkg/plugin/grpc/grpcjava",
+        "@build_stack_rules_proto//pkg/plugin/grpc/grpcnode",
+        "@build_stack_rules_proto//pkg/plugin/grpc/grpcweb",
+        "@build_stack_rules_proto//pkg/plugin/scalapb/scalapb",
+        "@build_stack_rules_proto//pkg/plugin/stackb/grpc_js",
+        "@build_stack_rules_proto//pkg/plugin/stephenh/ts-proto",
+        "@build_stack_rules_proto//pkg/rule/rules_cc",
+        "@build_stack_rules_proto//pkg/rule/rules_closure",
+        "@build_stack_rules_proto//pkg/rule/rules_go",
+        "@build_stack_rules_proto//pkg/rule/rules_java",
+        "@build_stack_rules_proto//pkg/rule/rules_nodejs",
+        "@build_stack_rules_proto//pkg/rule/rules_python",
+        "@build_stack_rules_proto//pkg/rule/rules_scala",
+    ],
+)
