@@ -45,11 +45,8 @@ git_override(
 
 git_override(
     module_name = "gazelle",
-    commit = "5254d18913a40bc91bc495648e4d60636147da4e",
+    commit = "d45893b6096b4f1f44f72fcbe915756a6e18de6b",
     patch_strip = 1,
-    patches = [
-        "//:third_party/gazelle/0001-googleapis.patch",
-    ],
     remote = "https://github.com/bazelbuild/bazel-gazelle",
 )
 

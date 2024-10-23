@@ -1,0 +1,17 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go",
+    srcs = ["tools.go"],
+    importpath = "github.com/ewhauser/simple-bzlmod/go",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@build_aspect_cli//gazelle/js",
+        "@com_github_dave_jennifer//:go_default_library",
+        "@com_github_go_delve_delve//pkg/version:go_default_library",
+        "@com_github_gofiber_fiber_v2//:go_default_library",
+        "@com_github_nishanths_exhaustive//:go_default_library",
+        "@com_github_sorcererxw_protoc_gen_go_grpc_mock//example:go_default_library",
+        "@com_github_sqlc_dev_sqlc//:go_default_library",
+    ],
+)
