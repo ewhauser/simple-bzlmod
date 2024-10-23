@@ -6,7 +6,7 @@ bazel_dep(name = "aspect_rules_swc", version = "2.0.1")
 bazel_dep(name = "aspect_rules_ts", version = "3.2.1")
 bazel_dep(name = "bazel_features", version = "1.19.0")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
-bazel_dep(name = "build_stack_rules_proto")
+bazel_dep(name = "build_stack_rules_proto", repo_name = "com_github_stackb_rules_proto")
 bazel_dep(name = "buildifier_prebuilt", version = "7.3.1")
 bazel_dep(name = "container_structure_test", version = "1.19.1")
 bazel_dep(name = "gazelle", repo_name = "bazel_gazelle")
@@ -45,7 +45,7 @@ git_override(
 
 git_override(
     module_name = "gazelle",
-    commit = "2a65ce83f2fc9cd7022139a621fe7fde8157a85f",
+    commit = "5254d18913a40bc91bc495648e4d60636147da4e",
     patch_strip = 1,
     patches = [
         "//:third_party/gazelle/0001-googleapis.patch",
@@ -134,8 +134,6 @@ go_deps.module_override(
 use_repo(
     go_deps,
     "build_aspect_cli",
-    "com_github_stackb_rules_proto",
-    "com_github_bazelbuild_bazel_gazelle",
 )
 
 ## python
@@ -164,7 +162,7 @@ buf.toolchains(version = "v1.5.0")
 use_repo(buf, "rules_buf_toolchains")
 
 ## proto
-proto_repository = use_extension("@build_stack_rules_proto//extensions:proto_repository.bzl", "proto_repository")
+proto_repository = use_extension("@com_github_stackb_rules_proto//extensions:proto_repository.bzl", "proto_repository")
 proto_repository.archive(
     name = "protoapis",
     build_directives = [

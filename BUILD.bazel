@@ -1,5 +1,5 @@
 load("@bazel_gazelle//:def.bzl", "gazelle_binary")
-load("@build_stack_rules_proto//rules:proto_gazelle.bzl", "proto_gazelle")
+load("@com_github_stackb_rules_proto//rules:proto_gazelle.bzl", "proto_gazelle")
 
 gazelle_binary(
     name = "gazelle-go-bin",

@@ -6,7 +6,7 @@ go_library(
     importpath = "github.com/ewhauser/simple-bzlmod/go/rules_proto/language",
     visibility = ["//visibility:public"],
     deps = [
-        "@com_github_bazelbuild_bazel_gazelle//language",
+        "@bazel_gazelle//language",
         "@com_github_stackb_rules_proto//pkg/language/protobuf",
         "@com_github_stackb_rules_proto//pkg/plugin/builtin",
         "@com_github_stackb_rules_proto//pkg/plugin/gogo/protobuf",

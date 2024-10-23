@@ -2,7 +2,7 @@
 Third-party proto dependencies
 """
 
-load("@build_stack_rules_proto//rules/proto:proto_repository.bzl", "proto_repository")
+load("@com_github_stackb_rules_proto//rules/proto:proto_repository.bzl", "proto_repository")
 
 def proto_repositories():
     """third party proto repositories
